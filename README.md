@@ -1,4 +1,9 @@
 ﻿# Schedulio-frontend
+ ## 下載虛擬環境套件
+ ```
+ pip3 install virtualenv
+ ```
+ 
  ## 創建虛擬環境
 ```
 virtualenv virt 
