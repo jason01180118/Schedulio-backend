@@ -1,9 +1,8 @@
 from sanic import Sanic
 from sanic.response import text
+from env import HOST, PORT
 
 app = Sanic("SimpleAPI")
-HOST = "localhost"
-PORT = 8000
 
 
 @app.get("/")

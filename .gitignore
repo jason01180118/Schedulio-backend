@@ -1,1 +1,4 @@
 conda_makefile.sh
+env.py
+.vscode/
+__pycache__/
