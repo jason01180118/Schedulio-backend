@@ -1,4 +1,4 @@
-﻿# Schedulio-frontend
+﻿# Schedulio-backend
  ## 下載虛擬環境套件
  ```
  pip3 install virtualenv
@@ -9,10 +9,15 @@
 virtualenv virt 
 ```
  ## 允許腳本運行(powershell)
- ```
+```
 Set-ExecutionPolicy Unrestricted -Scope Process
+```
+ ## 開啟虛擬環境
+ ```
 .\virt\Scripts\activate.ps1
 ```
+
+
 ## 安裝套件(會看到(virt)在前面)
 ```
 pip install -r requirements.txt 
