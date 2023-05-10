@@ -28,3 +28,9 @@ python app.py
  pip freeze
  pip freeze > requirements.txt
  ```
+
+ ## 建立 env.py
+ ```
+ cp env.example.py env.py
+ ```
+ 然後改自己的 env.py
