@@ -14,7 +14,7 @@ from googleapiclient.discovery import build
 class GoogleAPIClient:
     SECRET_PATH = 'Schedulio-backend/.credentials/client_secret3.json'
     CREDS_PATH = 'Schedulio-backend/.credentials/cred.json'
-    # USER_INFO = {"token": "ya29.a0AWY7CkmVMXhMiYh2iSKwiMYUxg7_YCIHRKB57EhH5SE92FS8HQnXb09tz23pQ-OyLuu0LCx_IxAgNZkxgpPRE_OfNTTiu9wotWX9Ffpv0Egkkzo_Lkfs0yO2VQF7vVv1k7Btb6mcvmt3V8F5IfrWCloHELPp15TWaCgYKAWQSARASFQG1tDrplPpmn2SdWt5HAnHBpoJkxQ0167", "refresh_token": "1//0eHJQpbn9Y6DVCgYIARAAGA4SNwF-L9Ir7OnU0PQem0ev-YkcOPRNFI_vzUaZ2ZCzAwQZU6mFHpSK9AsgkPERU8s2yvwsetO4zbA", "token_uri": "https://oauth2.googleapis.com/token", "client_id": "721138817334-krr2mpl9lg9crp9kep7nkjful41ro75f.apps.googleusercontent.com", "client_secret": "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", "scopes": ["https://www.googleapis.com/auth/calendar"], "expiry": "2023-05-11T08:19:25.301919Z"}
+    # USER_INFO = {"token": "", "refresh_token": "", "token_uri": "https://oauth2.googleapis.com/token", "client_id": "721138817334-krr2mpl9lg9crp9kep7nkjful41ro75f.apps.googleusercontent.com", "client_secret": "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", "scopes": ["https://www.googleapis.com/auth/calendar"], "expiry": "2023-05-11T08:19:25.301919Z"}
     # eventReadonlyScope = ['https://www.googleapis.com/auth/calendar.events.readonly']
     # calendarReadonlyScope = ['https://www.googleapis.com/auth/calendar.readonly']
     calendarFreebusyScope = ['https://www.googleapis.com/auth/calendar.freebusy']
