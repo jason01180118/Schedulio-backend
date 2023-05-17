@@ -4,7 +4,15 @@ from sanic_mail import Sanic_Mail
 from env import MAIL_SENDER, MAIL_SENDER_PASSWORD, MAIL_SEND_HOST, MAIL_SEND_PORT, MAIL_TLS, MAIL_START_TLS, MAIL_HOST, MAIL_PORT
 from database import TOKEN
 
+from cors import add_cors_headers
+
+
+
+
 app = Sanic(__name__)
+
+# Fill in CORS headers
+app.register_middleware(add_cors_headers, "response")
 app.config.update({
     'MAIL_SENDER': MAIL_SENDER,
     'MAIL_SENDER_PASSWORD': MAIL_SENDER_PASSWORD,
