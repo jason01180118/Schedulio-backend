@@ -1,24 +1,19 @@
 import os.path
-from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
-# import datefinder
-# from datetime import timedelta
-# from datetime import timezone
 import datetime
-
-# import pprint as pp
+import json
 from googleapiclient.discovery import build
-# from googleapiclient.errors import HttpError
+from sanic import Sanic
+from sanic.response import json
+from env import HOST, PORT
+
 
 class GoogleAPIClient:
-    SECRET_PATH = 'Schedulio-backend/.credentials/client_secret3.json'
+    SECRET_PATH = 'Schedulio-backend/.credentials/client_secret.json'
     CREDS_PATH = 'Schedulio-backend/.credentials/cred.json'
     # USER_INFO = {"token": "", "refresh_token": "", "token_uri": "https://oauth2.googleapis.com/token", "client_id": "721138817334-krr2mpl9lg9crp9kep7nkjful41ro75f.apps.googleusercontent.com", "client_secret": "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", "scopes": ["https://www.googleapis.com/auth/calendar"], "expiry": "2023-05-11T08:19:25.301919Z"}
-    # eventReadonlyScope = ['https://www.googleapis.com/auth/calendar.events.readonly']
-    # calendarReadonlyScope = ['https://www.googleapis.com/auth/calendar.readonly']
     calendarFreebusyScope = ['https://www.googleapis.com/auth/calendar.freebusy']
-    # calendarScope = ['https://www.googleapis.com/auth/calendar']
     serviceName = 'calendar'
     version = 'v3'
     def __init__(self) -> None:
@@ -59,79 +54,14 @@ class GoogleAPIClient:
         result = self.googleAPIService.freebusy().query(body = {"timeMin": now, "timeMax": next10week, 'timeZone': 'UTC+8', "items": [{"id": 'primary'}]}).execute()
         events = result['calendars']['primary']['busy']
         return events
-        
-            
-        
-        # now = datetime.datetime.today()
-        # now = now - datetime.timedelta(days=1)
-        # nextyear = now + datetime.timedelta(weeks=10)
-        # now = now.isoformat() + 'Z'
-        # nextyear = nextyear.isoformat() + 'Z'
-        
-        # result2 = self.googleAPIService.events().list(calendarId='primary',timeMin = now, timeMax = nextyear, singleEvents=True, orderBy='startTime').execute()
-        # events = result2.get('items', [])
-        # if not events:
-        #     print('No upcoming events found.')
-        # else:
-        #     for event in events:
-        #         # print(event)
-        #         # print()
-        #         a = []
-                
-        #         start = event['start'].get('dateTime', event['start'].get('date'))[:19]
-        #         end = event['end'].get('dateTime', event['end'].get('date'))[:19]
-        #         if event.get('summary'):
-        #             a.append(event['summary'])
-        #         else: 
-        #             a.append('無標題')
-                    
-        #         a.append(start)
-        #         a.append(end)
-        #         event_list.append(a)
-        
-        
-    # def create_event(self, start_time_str, summary, duration=1,attendees=None, description=None, location=None):
-    #     matches = list(datefinder.find_dates(start_time_str))
-    #     if len(matches):
-    #         start_time = matches[0]
-    #         end_time = start_time + timedelta(hours=duration)
-               
-    #     event = {
-    #         'summary': summary,
-    #         'location': location,
-    #         'description': description,
-    #         'start': {
-    #             'dateTime': start_time.strftime("%Y-%m-%dT%H:%M:%S"),
-    #             'timeZone': timezone,
-    #         },
-    #         'end': {
-    #             'dateTime': end_time.strftime("%Y-%m-%dT%H:%M:%S"),
-    #             'timeZone': timezone,
-    #         },
-    #         'attendees': [
-    #         {'email':attendees },
-    #     ],
-    #         'reminders': {
-    #             'useDefault': False,
-    #             'overrides': [
-    #                 {'method': 'email', 'minutes': 24 * 60},
-    #                 {'method': 'popup', 'minutes': 10},
-    #             ],
-    #         },
-    #     }
-    #     # json_event = json.load(event)
-    #     pp.pprint('''*** %r event added: 
-    #     With: %s
-    #     Start: %s
-    #     End:   %s''' % (summary.encode('utf-8'),
-    #         attendees,start_time, end_time))
-            
-    #     return self.googleAPIService.events().insert(calendarId='primary',sendNotifications=True, body=str(event)).execute()
+    
+app = Sanic(__name__)
 
-if __name__ == '__main__':
+@app.route("/get_calendar")
+def get_calendar(request):
     googleCalendarAPI = GoogleAPIClient()
     busy = googleCalendarAPI.getFreebusy()
-    for event in busy:
-        print(event)
-    
-    # googleSheetAPI.create_event('24 Jul 12.30pm', 'Test Meeting using CreateFunction Method', 0.5, 'jmhsu0816@email.com', 'Test Description', None)
+    return json(busy)
+
+if __name__ == '__main__':
+    app.run(host=HOST, port=PORT, debug=True)
