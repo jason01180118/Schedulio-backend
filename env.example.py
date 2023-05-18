@@ -1,5 +1,6 @@
 HOST = "localhost"
 PORT = 8000
+DATABASE = "Schedulio.db"
 MAIL_HOST = HOST
 MAIL_PORT = PORT
 MAIL_SENDER = "< 你的傳送信箱 >"
