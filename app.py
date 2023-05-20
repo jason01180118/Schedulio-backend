@@ -5,12 +5,12 @@ from sanic.response import text
 from Database import Database
 from env import HOST, PORT, DATABASE
 from cors import add_cors_headers
+from options import setup_options
 
 app = Sanic("Schedulio")
 db = Database(DATABASE)
 
-# Fill in CORS headers
-app.register_middleware(add_cors_headers, "response")
+
 
 
 @app.get("/")
@@ -18,7 +18,7 @@ def hello(request):
     return text("Hi 😎")
 
 
-@app.post("/sign_up")
+@app.route("/sign_up",methods=["post"])
 def sign_up(request):
     print()
     try:
@@ -27,7 +27,7 @@ def sign_up(request):
         return json({"error": "Account already exists"}, status=409)
 
 
-@app.route("/log_in")
+@app.route("/log_in",methods=["post"])
 def log_in(request):
     
     try:
@@ -36,5 +36,10 @@ def log_in(request):
         return json({"error": "Invalid account or password"}, status=401)
 
 
+
 if __name__ == "__main__":
+    # Add OPTIONS handlers to any route that is missing it
+    app.register_listener(setup_options, "before_server_start")
+    # Fill in CORS headers
+    app.register_middleware(add_cors_headers, "response")
     app.run(host=HOST, port=PORT, debug=True)
