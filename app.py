@@ -100,11 +100,15 @@ async def send_invite(request: Request):
 
 
 @app.route("/get_calendar")
-def get_calendar(request):
+def get_calendar(request: Request):
     googleCalendarAPI = GoogleAPIClient()
-    # busy = googleCalendarAPI.getFreebusy()
-    # return json(busy)
-    events = googleCalendarAPI.getEvent()
+    events = googleCalendarAPI.getEvent(request.cookies.get('token'))
+    return json(events)
+
+@app.route("/add_calendar")
+def add_calendar(request: Request):
+    googleCalendarAPI = GoogleAPIClient()
+    events = googleCalendarAPI.addNewAccountAndGetCalendar(request.cookies.get('token'))
     return json(events)
 
 if __name__ == "__main__":
