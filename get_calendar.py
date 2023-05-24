@@ -142,7 +142,7 @@ class GoogleAPIClient:
     #     events = result['calendars']['primary']['busy']
     #     return events
     
-app = Sanic(__name__)
+# app = Sanic(__name__)
 
 # @app.route("/get_calendar")
 # def get_calendar(request:Request):
