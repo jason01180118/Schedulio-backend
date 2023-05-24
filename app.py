@@ -12,6 +12,7 @@ from sanic_cors import CORS, cross_origin
 from Database import Database
 from env import HOST, PORT, DATABASE, MAIL_SENDER, MAIL_SENDER_PASSWORD, MAIL_SEND_HOST, MAIL_SEND_PORT, MAIL_TLS, \
     MAIL_START_TLS
+from get_calendar import GoogleAPIClient
 
 app = Sanic("Schedulio")
 CORS(app, resources={r"/*": {"origins": "*"}})
@@ -97,6 +98,14 @@ async def send_invite(request: Request):
     os.remove("invitations/" + filename)
     return json({"result": "200 OK"})
 
+
+@app.route("/get_calendar")
+def get_calendar(request):
+    googleCalendarAPI = GoogleAPIClient()
+    # busy = googleCalendarAPI.getFreebusy()
+    # return json(busy)
+    events = googleCalendarAPI.getEvent()
+    return json(events)
 
 if __name__ == "__main__":
     app.run(host=HOST, port=PORT, debug=True)

@@ -2,16 +2,12 @@ import os.path
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 import datetime
-import json
 from googleapiclient.discovery import build
-from sanic import Sanic
-from sanic.response import json
-from env import HOST, PORT
 
 
 class GoogleAPIClient:
-    SECRET_PATH = 'Schedulio-backend/.credentials/client_secret.json'
-    CREDS_PATH = 'Schedulio-backend/.credentials/cred.json'
+    SECRET_PATH = './.credentials/client_secret.json'
+    CREDS_PATH = './.credentials/cred.json'
     # USER_INFO = {"token": "", "refresh_token": "", "token_uri": "https://oauth2.googleapis.com/token", "client_id": "721138817334-krr2mpl9lg9crp9kep7nkjful41ro75f.apps.googleusercontent.com", "client_secret": "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", "scopes": ["https://www.googleapis.com/auth/calendar"], "expiry": "2023-05-11T08:19:25.301919Z"}
     calendarFreebusyScope = ['https://www.googleapis.com/auth/calendar.freebusy']
     calendareventScope = ['https://www.googleapis.com/auth/calendar.events.readonly']
@@ -101,16 +97,3 @@ class GoogleAPIClient:
         result = self.googleAPIService.freebusy().query(body = {"timeMin": now, "timeMax": next10week, 'timeZone': 'UTC+8', "items": [{"id": 'primary'}]}).execute()
         events = result['calendars']['primary']['busy']
         return events
-    
-app = Sanic(__name__)
-
-@app.route("/get_calendar")
-def get_calendar(request):
-    googleCalendarAPI = GoogleAPIClient()
-    # busy = googleCalendarAPI.getFreebusy()
-    # return json(busy)
-    events = googleCalendarAPI.getEvent()
-    return json(events)
-
-if __name__ == '__main__':
-    app.run(host=HOST, port=PORT, debug=True)
