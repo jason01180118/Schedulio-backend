@@ -24,6 +24,7 @@ app.config.update({
     "MAIL_SEND_PORT": MAIL_SEND_PORT,
     "MAIL_TLS": MAIL_TLS,
     "MAIL_START_TLS": MAIL_START_TLS
+    
 })
 sender = Sanic_Mail(app)
 db = Database(DATABASE)

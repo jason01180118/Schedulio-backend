@@ -1,6 +1,6 @@
 import hashlib
 import secrets
-from _sqlite3 import connect
+from sqlite3 import connect
 from datetime import datetime
 
 
