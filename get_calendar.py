@@ -5,11 +5,12 @@ from google.auth.transport.requests import Request
 import datetime
 import json as js
 from googleapiclient.discovery import build
+from Database import Database
 
-from sanic import Sanic
+from sanic import Sanic, Request
 from sanic.response import json
 from env import HOST, PORT
-
+db = Database(Database)
 
 
 class GoogleAPIClient:
@@ -23,71 +24,77 @@ class GoogleAPIClient:
     def __init__(self) -> None:
         self.creds1 = None
         
-    def getEvent(self):
+    def getEvent(self, token):
         usertoevents = {}
-        if os.path.exists(self.CREDS_PATH):
-            with open(self.CREDS_PATH, 'r') as json_file:
-                data = js.load(json_file)
+        # token = Request.cookies.get('token')
+        data = db.get_all_cred_by_token(token)
+        
+        # if os.path.exists(self.CREDS_PATH):
+        #     with open(self.CREDS_PATH, 'r') as json_file:
+        #         data = js.load(json_file)
             
-        else:
-            data = []
-            flow1 = InstalledAppFlow.from_client_secrets_file(
-                self.SECRET_PATH, self.calendareventScope)
-            self.creds1 = flow1.run_local_server(port=0)
-            self.emailAService = build('oauth2', 'v2', credentials=self.creds1)
-            user_info = self.emailAService.userinfo().get().execute()
-            email = user_info['email']
-            self.cred_map = {}
-            self.cred_map[email] = self.creds1.to_json()
-            data.append(self.cred_map)
-            with open(self.CREDS_PATH, 'w') as token:
-                js.dump(data, token)
+        # else:
+        #     data = []
+        #     flow1 = InstalledAppFlow.from_client_secrets_file(
+        #         self.SECRET_PATH, self.calendareventScope)
+        #     self.creds1 = flow1.run_local_server(port=0)
+        #     self.emailAService = build('oauth2', 'v2', credentials=self.creds1)
+        #     user_info = self.emailAService.userinfo().get().execute()
+        #     email = user_info['email']
+        #     self.cred_map = {}
+        #     self.cred_map[email] = self.creds1.to_json()
+        #     data.append(self.cred_map)
+        #     with open(self.CREDS_PATH, 'w') as token:
+        #         js.dump(data, token)
                 
         for i, m in enumerate(data):
-            for email, info in m.items():
-                info = js.loads(info)
-                self.creds1 = Credentials.from_authorized_user_info(info, self.calendareventScope)
-                if self.creds1 and self.creds1.expired and self.creds1.refresh_token:
-                    self.creds1.refresh(Request())
-                    data[i][email] = self.creds1
-                self.googleAPIService = build(self.serviceName, self.version, credentials=self.creds1)
+            email, info = m[0], m[1]
+            info = js.loads(info)
+            self.creds1 = Credentials.from_authorized_user_info(info, self.calendareventScope)
+            if self.creds1 and self.creds1.expired and self.creds1.refresh_token:
+                self.creds1.refresh(Request())
+                data[i][email] = self.creds1
+            self.googleAPIService = build(self.serviceName, self.version, credentials=self.creds1)
 
-                now = datetime.datetime.today()
-                now = now - datetime.timedelta(days=1)
-                next10week = now + datetime.timedelta(weeks=10)
-                now = now.isoformat() + 'Z'
-                next10week = next10week.isoformat() + 'Z'
+            now = datetime.datetime.today()
+            now = now - datetime.timedelta(days=1)
+            next10week = now + datetime.timedelta(weeks=10)
+            now = now.isoformat() + 'Z'
+            next10week = next10week.isoformat() + 'Z'
 
-                event_list = []
+            event_list = []
 
-                result2 = self.googleAPIService.events().list(calendarId='primary',timeMin = now, timeMax = next10week, singleEvents=True, orderBy='startTime').execute()
+            result2 = self.googleAPIService.events().list(calendarId='primary',timeMin = now, timeMax = next10week, singleEvents=True, orderBy='startTime').execute()
+            
+            events = result2.get('items', [])
+            for event in events:
+                a = {}
+
+                start = event['start'].get('dateTime', event['start'].get('date'))[:19]
+                end = event['end'].get('dateTime', event['end'].get('date'))[:19]
+                if event.get('summary'):
+                    a['title'] = (event['summary'])
+                else: 
+                    a['title'] = ('無標題')
+                a['startDate'] = start
+                a['endDate'] = end
+                event_list.append(a)  
                 
-                events = result2.get('items', [])
-                for event in events:
-                    a = {}
-
-                    start = event['start'].get('dateTime', event['start'].get('date'))[:19]
-                    end = event['end'].get('dateTime', event['end'].get('date'))[:19]
-                    if event.get('summary'):
-                        a['title'] = (event['summary'])
-                    else: 
-                        a['title'] = ('無標題')
-                    a['startDate'] = start
-                    a['endDate'] = end
-                    event_list.append(a)  
-                    
-                usertoevents[email] = event_list
-        with open(self.CREDS_PATH, 'w') as token:
-            js.dump(data, token)
+            usertoevents[email] = event_list
+        db.update_cred_by_email(info, email)
+        # with open(self.CREDS_PATH, 'w') as token:
+        #     js.dump(data, token)
             
         return usertoevents
     
-    def addNewAccountAndGetCalendar(self):    
+    def addNewAccountAndGetCalendar(self, token):    
         usertoevents = {}
         data = []
-        if os.path.exists(self.CREDS_PATH):
-            with open(self.CREDS_PATH, 'r') as json_file:
-                data = js.load(json_file)
+        
+        
+        # if os.path.exists(self.CREDS_PATH):
+        #     with open(self.CREDS_PATH, 'r') as json_file:
+        #         data = js.load(json_file)
                     
                     
         flow1 = InstalledAppFlow.from_client_secrets_file(
@@ -98,9 +105,15 @@ class GoogleAPIClient:
         email = user_info['email']
         self.cred_map = {}
         self.cred_map[email] = self.creds1.to_json()
-        data.append(self.cred_map)
-        with open(self.CREDS_PATH, 'w') as token:
-            js.dump(data, token)
+        a = Request
+        
+        # token = Request.cookies.get('token')
+        print()
+        print(token)
+        db.add_email_and_cred(token, email, self.creds1)
+        # data.append(self.cred_map)
+        # with open(self.CREDS_PATH, 'w') as token:
+        #     js.dump(data, token)
             
         usertoevents = self.getEvent()
 
@@ -131,17 +144,17 @@ class GoogleAPIClient:
     
 app = Sanic(__name__)
 
-@app.route("/get_calendar")
-def get_calendar(request):
-    googleCalendarAPI = GoogleAPIClient()
-    events = googleCalendarAPI.getEvent()
-    return json(events)
+# @app.route("/get_calendar")
+# def get_calendar(request:Request):
+#     googleCalendarAPI = GoogleAPIClient()
+#     events = googleCalendarAPI.getEvent(request.cookies.get('token'))
+#     return json(events)
 
-@app.route("/add_calendar")
-def add_calendar(request):
-    googleCalendarAPI = GoogleAPIClient()
-    events = googleCalendarAPI.addNewAccountAndGetCalendar()
-    return json(events)
+# @app.route("/add_calendar")
+# def add_calendar(request:Request):
+#     googleCalendarAPI = GoogleAPIClient()
+#     events = googleCalendarAPI.addNewAccountAndGetCalendar(request.cookies.get('token'))
+#     return json(events)
 
-if __name__ == '__main__':
-    app.run(host=HOST, port=PORT, debug=True)
+# if __name__ == '__main__':
+#     app.run(host=HOST, port=PORT, debug=True)
