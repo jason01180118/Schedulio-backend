@@ -2,12 +2,12 @@ from sqlite3 import IntegrityError
 
 from sanic import Sanic, json
 from sanic.response import text
+from sanic_cors import CORS, cross_origin
 from Database import Database
 from env import HOST, PORT, DATABASE
-from cors import add_cors_headers
 
 app = Sanic("Schedulio")
-app.register_middleware(add_cors_headers, "response")
+CORS(app, resources={r"/*":{"origins":"*"}})
 db = Database(DATABASE)
 
 
@@ -17,6 +17,7 @@ def hello(request):
 
 
 @app.route("/sign_up", methods=["POST"])
+@cross_origin(app)
 def sign_up(request):
     try:
         return text(str(db.add_user_and_get_id(request.form.get("account"), request.form.get("password"))))
@@ -25,6 +26,7 @@ def sign_up(request):
 
 
 @app.route("/log_in", methods=["POST"])
+@cross_origin(app)
 def log_in(request):
     try:
         return text(str(db.login_and_get_id(request.form.get("account"), request.form.get("password"))))
