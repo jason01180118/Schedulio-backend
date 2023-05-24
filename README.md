@@ -27,7 +27,7 @@ Set-ExecutionPolicy Unrestricted -Scope Process
 ## 安裝套件(會看到(virt)在前面)
 
 ```
-pip install -r requirements.txt 
+pip install -r requirements.txt
 python app.py
 ```
 

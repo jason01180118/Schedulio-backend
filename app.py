@@ -14,7 +14,7 @@ from env import HOST, PORT, DATABASE, MAIL_SENDER, MAIL_SENDER_PASSWORD, MAIL_SE
     MAIL_START_TLS
 
 app = Sanic("Schedulio")
-CORS(app, resources={r"/*":{"origins":"*"}})
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 app.config.update({
     "MAIL_SENDER": MAIL_SENDER,
@@ -37,7 +37,8 @@ def hello(request: Request):
 @cross_origin(app)
 def sign_up(request: Request):
     try:
-        return text(db.sign_up_and_get_token(request.form.get("account"), request.form.get("password")))
+        data = request.json.get("data")
+        return text(db.sign_up_and_get_token(data["account"], data["password"]))
     except IntegrityError:
         return json({"error": "Account already exists"}, status=409)
 
@@ -46,7 +47,8 @@ def sign_up(request: Request):
 @cross_origin(app)
 def log_in(request: Request):
     try:
-        return text(db.login_and_get_token(request.form.get("account"), request.form.get("password")))
+        data = request.json.get("data")
+        return text(db.login_and_get_token(data["account"], data["password"]))
     except TypeError:
         return json({"error": "Invalid account or password"}, status=401)
 
@@ -67,7 +69,7 @@ async def send(request: Request):
 
 
 @app.get("/mail/invite")
-async def send_invite(request):
+async def send_invite(request: Request):
     if db.check_if_token_exist(request.cookies.get('token')):
         return json({"result": "401 Unauthorized"})
     if request.args.get("email") is None:
@@ -94,6 +96,7 @@ async def send_invite(request):
     )
     os.remove("invitations/" + filename)
     return json({"result": "200 OK"})
+
 
 if __name__ == "__main__":
     app.run(host=HOST, port=PORT, debug=True)
