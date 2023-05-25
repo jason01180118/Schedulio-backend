@@ -15,7 +15,7 @@ from env import HOST, PORT, DATABASE, MAIL_SENDER, MAIL_SENDER_PASSWORD, MAIL_SE
 from get_calendar import GoogleAPIClient
 
 app = Sanic("Schedulio")
-CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(app, resources={r"/*": {"origins": "*","supports_credentials": True}})
 
 app.config.update({
     "MAIL_SENDER": MAIL_SENDER,
@@ -49,6 +49,7 @@ def sign_up(request: Request):
 @cross_origin(app)
 def log_in(request: Request):
     try:
+        print(request.cookies)
         data = request.json.get("data")
         return text(db.login_and_get_token(data["account"], data["password"]))
     except TypeError:
@@ -103,6 +104,7 @@ async def send_invite(request: Request):
 @app.route("/get_calendar")
 def get_calendar(request: Request):
     googleCalendarAPI = GoogleAPIClient()
+    print(request.cookies)
     events = googleCalendarAPI.getEvent(request.cookies.get('token'))
     return json(events)
 
