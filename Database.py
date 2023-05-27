@@ -20,7 +20,8 @@ class Database:
             cursor = conn.cursor()
             cursor.execute(
                 "INSERT INTO users (account, password, token) VALUES (?, ?, ?)",
-                (account, encode(password), token := f'{id}{datetime.now().strftime("%Y%m%d")}{secrets.token_urlsafe(32)}')
+                (account, encode(password),
+                 token := f"{id}{datetime.now().strftime('%Y%m%d')}{secrets.token_urlsafe(32)}")
             )
             conn.commit()
             return token
@@ -35,7 +36,7 @@ class Database:
             user_id = cursor.fetchone()[0]
             cursor.execute(
                 "UPDATE users SET token = ? WHERE id = ?",
-                (token := f'{user_id}{datetime.now().strftime("%Y%m%d%H%M%S")}{secrets.token_urlsafe(32)}', user_id)
+                (token := f"{user_id}{datetime.now().strftime('%Y%m%d%H%M%S')}{secrets.token_urlsafe(32)}", user_id)
             )
             conn.commit()
             return token

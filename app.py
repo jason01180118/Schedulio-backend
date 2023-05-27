@@ -15,7 +15,7 @@ from env import HOST, PORT, DATABASE, MAIL_SENDER, MAIL_SENDER_PASSWORD, MAIL_SE
 from get_calendar import GoogleAPIClient
 
 app = Sanic("Schedulio")
-CORS(app, resources={r"/*": {"origins": "*","supports_credentials": True}})
+CORS(app, resources={r"/*": {"origins": "*", "supports_credentials": True}})
 
 app.config.update({
     "MAIL_SENDER": MAIL_SENDER,
@@ -24,7 +24,7 @@ app.config.update({
     "MAIL_SEND_PORT": MAIL_SEND_PORT,
     "MAIL_TLS": MAIL_TLS,
     "MAIL_START_TLS": MAIL_START_TLS
-    
+
 })
 sender = Sanic_Mail(app)
 db = Database(DATABASE)
@@ -49,7 +49,6 @@ def sign_up(request: Request):
 @cross_origin(app)
 def log_in(request: Request):
     try:
-        print(request.cookies)
         data = request.json.get("data")
         return text(db.login_and_get_token(data["account"], data["password"]))
     except TypeError:
@@ -58,7 +57,7 @@ def log_in(request: Request):
 
 @app.get("/mail/send")
 async def send(request: Request):
-    if db.check_if_token_exist(request.cookies.get('token')):
+    if db.check_if_token_exist(request.cookies.get("token")):
         return json({"result": "401 Unauthorized"})
     if request.args.get("email") is None:
         return json({"result": "400 Bad Request"})
@@ -73,7 +72,7 @@ async def send(request: Request):
 
 @app.get("/mail/invite")
 async def send_invite(request: Request):
-    if db.check_if_token_exist(request.cookies.get('token')):
+    if db.check_if_token_exist(request.cookies.get("token")):
         return json({"result": "401 Unauthorized"})
     if request.args.get("email") is None:
         return json({"result": "400 Bad Request"})
@@ -107,11 +106,13 @@ def get_calendar(request: Request):
     events = googleCalendarAPI.getEvent(request.args.get("token"))
     return json(events)
 
+
 @app.route("/add_calendar")
 def add_calendar(request: Request):
     googleCalendarAPI = GoogleAPIClient()
-    events = googleCalendarAPI.addNewAccountAndGetCalendar(request.cookies.get('token'))
+    events = googleCalendarAPI.addNewAccountAndGetCalendar(request.cookies.get("token"))
     return json(events)
+
 
 if __name__ == "__main__":
     app.run(host=HOST, port=PORT, debug=True)
