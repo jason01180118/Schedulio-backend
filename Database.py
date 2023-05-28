@@ -70,7 +70,30 @@ class Database:
             cursor = conn.cursor()
             cursor.execute(
                 "SELECT emails.email, emails.credential FROM emails "
-                "JOIN users ON emails.user_id = users.id WHERE users.session = ?",
+                "JOIN users ON emails.user_id = users.id WHERE users.session = ? "
+                "ORDER BY emails.id",
                 (session,)
             )
             return cursor.fetchall()
+
+    def get_all_cred_by_account(self, account: str) -> list[tuple[str, str]]:
+        with connect(self.db) as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT emails.email, emails.credential FROM emails "
+                "JOIN users ON emails.user_id = users.id WHERE users.account = ? "
+                "ORDER BY emails.id",
+                (account,)
+            )
+            return cursor.fetchall()
+
+    def get_first_email_by_account(self, account: str) -> str:
+        with connect(self.db) as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT emails.email FROM emails "
+                "JOIN users ON emails.user_id = users.id WHERE users.account = ? "
+                "ORDER BY emails.id",
+                (account,)
+            )
+            return cursor.fetchone()[0]
