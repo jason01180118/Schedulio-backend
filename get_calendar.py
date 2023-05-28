@@ -149,8 +149,8 @@ class GoogleAPIClient:
 #     events = googleCalendarAPI.getEvent(request.cookies.get("session"))
 #     return json(events)
 
-# @app.route("/add_calendar")
-# def add_calendar(request:Request):
+# @app.route("/add_email")
+# def add_email(request:Request):
 #     googleCalendarAPI = GoogleAPIClient()
 #     events = googleCalendarAPI.addNewAccountAndGetCalendar(request.cookies.get("session"))
 #     return json(events)
