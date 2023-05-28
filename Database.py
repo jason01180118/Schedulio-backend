@@ -50,9 +50,11 @@ class Database:
     def add_email_and_cred(self, token: str, email: str, credential: str) -> None:
         with connect(self.db) as conn:
             cursor = conn.cursor()
+            cursor.execute("SELECT id FROM users WHERE token = ?", (token,))
+            user_id = cursor.fetchone()[0]
             cursor.execute(
                 "INSERT INTO emails (user_id, email, credential) VALUES (?, ?, ?)",
-                (token, email, credential)
+                (user_id, email, credential)
             )
             conn.commit()
 
