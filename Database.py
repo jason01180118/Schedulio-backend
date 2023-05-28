@@ -76,6 +76,17 @@ class Database:
             )
             return cursor.fetchall()
 
+    def get_all_cred_by_account(self, account: str) -> list[tuple[str, str]]:
+        with connect(self.db) as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT emails.email, emails.credential FROM emails "
+                "JOIN users ON emails.user_id = users.id WHERE users.account = ? "
+                "ORDER BY emails.id",
+                (account,)
+            )
+            return cursor.fetchall()
+
     def get_first_email_by_account(self, account: str) -> str:
         with connect(self.db) as conn:
             cursor = conn.cursor()

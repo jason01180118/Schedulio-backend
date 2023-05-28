@@ -5,8 +5,8 @@ from sqlite3 import IntegrityError
 
 import aiofiles
 from ics import Calendar, Event
-from sanic import Sanic, json, Request, redirect
-from sanic.response import text
+from sanic import Sanic, json, Request
+from sanic.response import text, redirect
 from sanic_mail import Sanic_Mail
 from sanic_cors import CORS, cross_origin
 from Database import Database
@@ -120,7 +120,7 @@ def add_email(request: Request):
     googleCalendarAPI = GoogleAPIClient()
     googleCalendarAPI.addNewAccountAndGetCalendar(request.args.get("session"))
     # googleCalendarAPI.addNewAccountAndGetCalendar(451)
-    return redirect("localhost:3000/calendar")
+    return redirect("/get_calendar")
 
 
 if __name__ == "__main__":
