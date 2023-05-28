@@ -56,7 +56,7 @@ class GoogleAPIClient:
             # info = js.loads(info)
             self.creds1 = Credentials.from_authorized_user_info (js.loads(info), self.calendareventScope)
             if self.creds1 and self.creds1.expired and self.creds1.refresh_token:
-                self.creds1.refresh(Request)
+                self.creds1.refresh(Request())
                 # data[i][email] = self.creds1
             self.googleAPIService = build(self.serviceName, self.version, credentials=self.creds1)
 
@@ -72,6 +72,8 @@ class GoogleAPIClient:
                                                           singleEvents=True, orderBy="startTime").execute()
 
             events = result2.get("items", [])
+            print(events)
+            print()
             for event in events:
                 a = {}
 
