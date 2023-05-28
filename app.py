@@ -65,7 +65,7 @@ async def send(request: Request):
     if is_not_pass_auth:
         return json({"result": "401 Unauthorized"}, status=401)
     if request.args.get("email") is None:
-        return json({"result": "400 Bad Request"})
+        return json({"result": "400 Bad Request"}, status=400)
 
     await request.app.ctx.send_email(
         targetlist=request.args.get("email"),
@@ -81,7 +81,7 @@ async def send_invite(request: Request):
     if is_not_pass_auth:
         return json({"result": "401 Unauthorized"}, status=401)
     if request.args.get("email") is None:
-        return json({"result": "400 Bad Request"})
+        return json({"result": "400 Bad Request"}, status=400)
 
     c = Calendar()
     e = Event()
