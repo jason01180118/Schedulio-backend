@@ -26,13 +26,16 @@ class GoogleAPIClient:
     def __init__(self) -> None:
         self.creds1 = None
 
-    def getEvent(self, session, nameVisible):
+    def getEvent(self, session, account):
         usertoevents = {}
         # session = Request.cookies.get("session")
+        nameVisible = False
+        if(account == None):
+            nameVisible = True
         if(nameVisible):
             data = db.get_all_cred_by_session(session)
         else:
-            data = db.get_all_cred_by_account(session)
+            data = db.get_all_cred_by_account(account)
         # if os.path.exists(self.CREDS_PATH):
         #     with open(self.CREDS_PATH, "r") as json_file:
         #         data = js.load(json_file)
@@ -72,8 +75,8 @@ class GoogleAPIClient:
                                                           singleEvents=True, orderBy="startTime").execute()
 
             events = result2.get("items", [])
-            print(events)
-            print()
+            # print(events)
+            # print()
             for event in events:
                 a = {}
 
