@@ -2,6 +2,7 @@ import hashlib
 import secrets
 from sqlite3 import connect
 from datetime import datetime
+from typing import Any
 
 
 def encode(password: str) -> str:
@@ -96,7 +97,7 @@ class Database:
             )
             return cursor.fetchall()
 
-    def get_first_email_by_account(self, account: str) -> str:
+    def get_first_email_by_account(self, account: str) -> str | None:
         with connect(self.db) as conn:
             cursor = conn.cursor()
             cursor.execute(
@@ -105,4 +106,7 @@ class Database:
                 "ORDER BY emails.id",
                 (account,)
             )
-            return cursor.fetchone()[0]
+            email = cursor.fetchone()
+            if email is None:
+                return None
+            return email[0]
