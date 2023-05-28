@@ -103,7 +103,8 @@ async def send_invite(request: Request):
 @app.route("/get_calendar")
 def get_calendar(request: Request):
     googleCalendarAPI = GoogleAPIClient()
-    events = googleCalendarAPI.getEvent(request.cookies.get("token"))
+    events = googleCalendarAPI.getEvent(451)
+    # events = googleCalendarAPI.getEvent(request.cookies.get("token"))
     return json(events)
 
 
