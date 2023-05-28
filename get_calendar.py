@@ -72,6 +72,8 @@ class GoogleAPIClient:
                                                           singleEvents=True, orderBy="startTime").execute()
 
             events = result2.get("items", [])
+            print(events)
+            print()
             for event in events:
                 a = {}
 
