@@ -1,5 +1,5 @@
 import datetime
-import json as js
+import json
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -59,7 +59,7 @@ class GoogleAPIClient:
             print(email)
             print(info)
             print()
-            self.creds1 = Credentials.from_authorized_user_info (js.loads(info), self.calendareventScope)
+            self.creds1 = Credentials.from_authorized_user_info(json.loads(info), self.calendareventScope)
             print(self.creds1)
             print()
             if self.creds1 and self.creds1.expired and self.creds1.refresh_token:
@@ -99,7 +99,7 @@ class GoogleAPIClient:
 
         return usertoevents
 
-    def addNewAccountAndGetCalendar(self, token):
+    def addNewAccount(self, token):
         usertoevents = {}
         data = []
 

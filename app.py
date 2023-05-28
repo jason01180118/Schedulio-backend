@@ -111,7 +111,7 @@ def get_calendar(request: Request):
 @app.route("/add_calendar")
 def add_calendar(request: Request):
     googleCalendarAPI = GoogleAPIClient()
-    googleCalendarAPI.addNewAccountAndGetCalendar(request.cookies.get("token"))
+    googleCalendarAPI.addNewAccount(request.cookies.get("token"))
     # googleCalendarAPI.addNewAccountAndGetCalendar(451)
     return json('success')
 
