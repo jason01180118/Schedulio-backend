@@ -84,7 +84,7 @@ class GoogleAPIClient:
                 event_list.append(a)
 
             usertoevents[email] = event_list
-            db.update_cred_by_email(info, email)
+            db.update_cred_by_email((self.creds1.to_json()), email)
         # with open(self.CREDS_PATH, "w") as token:
         #     js.dump(data, token)
 
@@ -111,12 +111,13 @@ class GoogleAPIClient:
         # token = Request.cookies.get("token")
         print()
         print(token)
-        db.add_email_and_cred(token, email, self.creds1)
+        info = self.creds1.to_json()
+        db.add_email_and_cred(token, email, (info))
         # data.append(self.cred_map)
         # with open(self.CREDS_PATH, "w") as token:
         #     js.dump(data, token)
 
-        usertoevents = self.getEvent()
+        usertoevents = self.getEvent(token)
 
         return usertoevents
 
