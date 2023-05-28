@@ -30,9 +30,6 @@ class GoogleAPIClient:
         usertoevents = {}
         # token = Request.cookies.get("token")
         data = db.get_all_cred_by_token(token)
-        print()
-        print(data)
-        print()
 
         # if os.path.exists(self.CREDS_PATH):
         #     with open(self.CREDS_PATH, "r") as json_file:
@@ -55,13 +52,7 @@ class GoogleAPIClient:
         for i, m in enumerate(data):
             email, info = m[0], m[1]
             # info = js.loads(info)
-            print()
-            print(email)
-            print(info)
-            print()
             self.creds1 = Credentials.from_authorized_user_info (js.loads(info), self.calendareventScope)
-            print(self.creds1)
-            print()
             if self.creds1 and self.creds1.expired and self.creds1.refresh_token:
                 self.creds1.refresh(Request())
                 data[i][email] = self.creds1
@@ -118,8 +109,6 @@ class GoogleAPIClient:
         # a = Request
 
         # token = Request.cookies.get("token")
-        print()
-        print(token)
         info = self.creds1.to_json()
         db.add_email_and_cred(token, email, (info))
         # data.append(self.cred_map)
