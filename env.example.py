@@ -1,5 +1,6 @@
 HOST = "localhost"
 PORT = 8000
+FRONTEND_PORT = 3000
 DATABASE = "Schedulio.db"
 MAIL_HOST = HOST
 MAIL_PORT = PORT
