@@ -15,7 +15,7 @@ class Database:
     def __init__(self, db: str):
         self.db = db
 
-    def sign_up(self, account: str, password: str) -> str:
+    def sign_up(self, account: str, password: str) -> None:
         with connect(self.db) as conn:
             cursor = conn.cursor()
             cursor.execute(
@@ -54,6 +54,9 @@ class Database:
     def add_email_and_cred(self, session: str, email: str, credential: str) -> None:
         with connect(self.db) as conn:
             cursor = conn.cursor()
+            cursor.execute("SELECT * FROM emails WHERE session = ? AND email = ?", (session, email))
+            if cursor.fetchone() is not None:
+                return
             cursor.execute("SELECT id FROM users WHERE session = ?", (session,))
             user_id = cursor.fetchone()[0]
             cursor.execute(
