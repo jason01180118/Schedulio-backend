@@ -68,9 +68,9 @@ async def view_other_calendar(request: Request, account: str):
 
     email = db.get_first_email_by_account(account)
     viewer_account = db.get_account_by_session(request.args.get("session"))
-    if email != None:
+    if email is not None:
         await request.app.ctx.send_email(
-            targetlist= email,
+            targetlist=email,
             subject=f"抓到！{viewer_account} 偷看了你的行事曆！",
             content=f"您好：\n\n請小心 {viewer_account}，因為他看了你的行事曆。\n你也可以查看他的行事曆，因為這樣才公平。\n\n點此查看他的行事曆：http://{HOST}:{FRONTEND_PORT}/{viewer_account}"
         )
