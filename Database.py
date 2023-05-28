@@ -51,7 +51,7 @@ class Database:
         with connect(self.db) as conn:
             cursor = conn.cursor()
             cursor.execute(
-                "INSERT INTO emails (token, email, credential) VALUES (?, ?, ?)",
+                "INSERT INTO emails (user_id, email, credential) VALUES (?, ?, ?)",
                 (token, email, credential)
             )
             conn.commit()
