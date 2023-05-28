@@ -55,12 +55,16 @@ def log_in(request: Request):
         return json({"error": "Invalid account or password"}, status=401)
 
 
+async def check_token(request: Request):
+    return not db.check_if_token_exist(request.cookies.get("token"))
+
 @app.get("/mail/send")
 async def send(request: Request):
-    if db.check_if_token_exist(request.cookies.get("token")):
-        return json({"result": "401 Unauthorized"})
+    is_not_pass_auth = await check_token(request)
+    if is_not_pass_auth:
+        return json({"result": "401 Unauthorized"}, status=401)
     if request.args.get("email") is None:
-        return json({"result": "400 Bad Request"})
+        return json({"result": "400 Bad Request"}, status=400)
 
     await request.app.ctx.send_email(
         targetlist=request.args.get("email"),
@@ -72,10 +76,11 @@ async def send(request: Request):
 
 @app.get("/mail/invite")
 async def send_invite(request: Request):
-    if db.check_if_token_exist(request.cookies.get("token")):
-        return json({"result": "401 Unauthorized"})
+    is_not_pass_auth = await check_token(request)
+    if is_not_pass_auth:
+        return json({"result": "401 Unauthorized"}, status=401)
     if request.args.get("email") is None:
-        return json({"result": "400 Bad Request"})
+        return json({"result": "400 Bad Request"}, status=400)
 
     c = Calendar()
     e = Event()
