@@ -111,6 +111,10 @@ async def send_invite(request: Request):
 
 @app.route("/get_calendar")
 def get_calendar(request: Request):
+    is_not_pass_auth = await check_session(request)
+    if is_not_pass_auth:
+        return json({"result": "401 Unauthorized"}, status=401)
+
     googleCalendarAPI = GoogleAPIClient()
     events = googleCalendarAPI.getEvent(session=request.args.get("session"))
     return json(events)
@@ -118,6 +122,10 @@ def get_calendar(request: Request):
 
 @app.route("/add_email")
 def add_email(request: Request):
+    is_not_pass_auth = await check_session(request)
+    if is_not_pass_auth:
+        return json({"result": "401 Unauthorized"}, status=401)
+
     googleCalendarAPI = GoogleAPIClient()
     googleCalendarAPI.addNewAccountAndGetCalendar(request.args.get("session"))
     return redirect(f"http://{HOST}:{FRONTEND_PORT}/calendar")
