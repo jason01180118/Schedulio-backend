@@ -84,7 +84,7 @@ class GoogleAPIClient:
                 event_list.append(a)
 
             usertoevents[email] = event_list
-        db.update_cred_by_email(info, email)
+            db.update_cred_by_email(info, email)
         # with open(self.CREDS_PATH, "w") as token:
         #     js.dump(data, token)
 
