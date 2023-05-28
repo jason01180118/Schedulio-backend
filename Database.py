@@ -39,6 +39,12 @@ class Database:
             conn.commit()
             return session
 
+    def get_account_by_session(self, session: str) -> str:
+        with connect(self.db) as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT account FROM users WHERE session = ?", (session,))
+            return cursor.fetchone()[0]
+
     def check_if_session_exist(self, session: str) -> bool:
         with connect(self.db) as conn:
             cursor = conn.cursor()

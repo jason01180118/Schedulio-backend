@@ -121,7 +121,7 @@ def add_email(request: Request):
     googleCalendarAPI = GoogleAPIClient()
     googleCalendarAPI.addNewAccountAndGetCalendar(request.args.get("session"))
     # googleCalendarAPI.addNewAccountAndGetCalendar("451")
-    return redirect("/get_calendar")
+    return redirect("localhost:3000/calendar")
 
 
 if __name__ == "__main__":
