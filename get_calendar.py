@@ -26,7 +26,7 @@ class GoogleAPIClient:
     def __init__(self) -> None:
         self.creds1 = None
 
-    def getEvent(self, session, account = None):
+    def getEvent(self, session = None, account = None):
         usertoevents = {}
         # session = Request.cookies.get("session")
         nameVisible = False

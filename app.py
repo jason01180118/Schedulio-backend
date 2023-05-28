@@ -63,7 +63,7 @@ async def view_other_calendar(request: Request, account: str):
         return json({"result": "401 Unauthorized"}, status=401)
 
     googleCalendarAPI = GoogleAPIClient()
-    events = googleCalendarAPI.getEvent(account)
+    events = googleCalendarAPI.getEvent(account = account)
 
     email = db.get_first_email_by_account(account)
     viewer_account = db.get_account_by_session(request.args.get("session"))
@@ -110,7 +110,7 @@ async def send_invite(request: Request):
 @app.route("/get_calendar")
 def get_calendar(request: Request):
     googleCalendarAPI = GoogleAPIClient()
-    events = googleCalendarAPI.getEvent(request.args.get("session"), request.args.get("account"))
+    events = googleCalendarAPI.getEvent(session= request.args.get("session"))
     return json(events)
 
 
