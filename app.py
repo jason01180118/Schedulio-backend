@@ -64,7 +64,7 @@ async def view_other_calendar(request: Request, account: str):
         return json({"result": "401 Unauthorized"}, status=401)
 
     googleCalendarAPI = GoogleAPIClient()
-    events = googleCalendarAPI.getEvent(account=account)
+    events = googleCalendarAPI.get_event(account=account)
 
     email = db.get_first_email_by_account(account)
     viewer_account = db.get_account_by_session(request.args.get("session"))
@@ -78,7 +78,7 @@ async def view_other_calendar(request: Request, account: str):
     return json(events)
 
 
-@app.get("/mail/invite")
+@app.post("/mail/invite")
 async def send_invite(request: Request):
     is_not_pass_auth = await check_session(request)
     if is_not_pass_auth:
@@ -88,9 +88,9 @@ async def send_invite(request: Request):
 
     c = Calendar()
     e = Event()
-    e.name = "My cool event"
-    e.begin = "2023-05-17 12:00:00"  # +8 hours
-    e.end = "2023-05-17 13:00:00"  # +8 hours
+    e.name = request.json.get("title")
+    e.begin = request.json.get("startDate")
+    e.end = request.json.get("endDate")
     c.events.add(e)
     filename = "".join(random.choice(string.ascii_letters + string.digits) for _ in range(10)) + ".ics"
     with open("invitations/" + filename, "w") as my_file:
@@ -100,9 +100,9 @@ async def send_invite(request: Request):
     async with aiofiles.open("invitations/" + filename, "rb") as f:
         attachments[e.name + ".ics"] = await f.read()
     await request.app.ctx.send_email(
-        targetlist=request.args.get("email"),
-        subject="測試傳送",
-        content="測試傳送uu",
+        targetlist=db.get_first_email_by_account(request.json.get("account")),
+        subject="⚠️⚡🐛💦😱💩🚫🦖☄🚀🌈🚨",
+        content=request.json.get("content"),
         attachments=attachments
     )
     os.remove("invitations/" + filename)
@@ -116,7 +116,7 @@ async def get_calendar(request: Request):
         return json({"result": "401 Unauthorized"}, status=401)
 
     googleCalendarAPI = GoogleAPIClient()
-    events = googleCalendarAPI.getEvent(session=request.args.get("session"))
+    events = googleCalendarAPI.get_event(session=request.args.get("session"))
     return json(events)
 
 
@@ -127,7 +127,7 @@ async def add_email(request: Request):
         return json({"result": "401 Unauthorized"}, status=401)
 
     googleCalendarAPI = GoogleAPIClient()
-    googleCalendarAPI.addEmail(request.args.get("session"))
+    googleCalendarAPI.add_email(request.args.get("session"))
     return redirect(f"http://{HOST}:{FRONTEND_PORT}/calendar")
 
 
