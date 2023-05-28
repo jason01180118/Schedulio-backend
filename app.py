@@ -110,9 +110,7 @@ async def send_invite(request: Request):
 @app.route("/get_calendar")
 def get_calendar(request: Request):
     googleCalendarAPI = GoogleAPIClient()
-    # events = googleCalendarAPI.getEvent("451", True)
-    # events = googleCalendarAPI.getEvent("test", False)
-    events = googleCalendarAPI.getEvent(request.args.get("session"), True)
+    events = googleCalendarAPI.getEvent(request.args.get("session"), request.args.get("account"))
     return json(events)
 
 
@@ -120,7 +118,6 @@ def get_calendar(request: Request):
 def add_email(request: Request):
     googleCalendarAPI = GoogleAPIClient()
     googleCalendarAPI.addNewAccountAndGetCalendar(request.args.get("session"))
-    # googleCalendarAPI.addNewAccountAndGetCalendar("451")
     return redirect("localhost:3000/calendar")
 
 
