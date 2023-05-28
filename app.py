@@ -10,7 +10,8 @@ from sanic.response import text, redirect
 from sanic_mail import Sanic_Mail
 from sanic_cors import CORS, cross_origin
 from Database import Database
-from env import HOST, PORT, FRONTEND_PORT, DATABASE, MAIL_SENDER, MAIL_SENDER_PASSWORD, MAIL_SEND_HOST, MAIL_SEND_PORT, MAIL_TLS, \
+from env import HOST, PORT, FRONTEND_PORT, DATABASE, MAIL_SENDER, MAIL_SENDER_PASSWORD, MAIL_SEND_HOST, MAIL_SEND_PORT, \
+    MAIL_TLS, \
     MAIL_START_TLS
 from get_calendar import GoogleAPIClient
 
@@ -63,17 +64,17 @@ async def view_other_calendar(request: Request, account: str):
         return json({"result": "401 Unauthorized"}, status=401)
 
     googleCalendarAPI = GoogleAPIClient()
-    events = googleCalendarAPI.getEvent(account = account)
+    events = googleCalendarAPI.getEvent(account=account)
 
     email = db.get_first_email_by_account(account)
     viewer_account = db.get_account_by_session(request.args.get("session"))
     await request.app.ctx.send_email(
-        targetlist= email,
+        targetlist=email,
         subject=f"抓到！{viewer_account} 偷看了你的行事曆！",
         content=f"您好：\n\n請小心 {viewer_account}，因為他看了你的行事曆。\n你也可以查看他的行事曆，因為這樣才公平。\n\n點此查看他的行事曆：http://{HOST}:{FRONTEND_PORT}/{viewer_account}"
     )
 
-    return events
+    return json(events)
 
 
 @app.get("/mail/invite")
@@ -110,7 +111,7 @@ async def send_invite(request: Request):
 @app.route("/get_calendar")
 def get_calendar(request: Request):
     googleCalendarAPI = GoogleAPIClient()
-    events = googleCalendarAPI.getEvent(session= request.args.get("session"))
+    events = googleCalendarAPI.getEvent(session=request.args.get("session"))
     return json(events)
 
 

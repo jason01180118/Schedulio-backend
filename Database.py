@@ -54,7 +54,7 @@ class Database:
     def add_email_and_cred(self, session: str, email: str, credential: str) -> None:
         with connect(self.db) as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM emails WHERE session = ? AND email = ?", (session, email))
+            cursor.execute("SELECT * FROM emails WHERE email = ?", (email,))
             if cursor.fetchone() is not None:
                 return
             cursor.execute("SELECT id FROM users WHERE session = ?", (session,))
