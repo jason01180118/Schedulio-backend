@@ -11,7 +11,6 @@ from env import DATABASE
 
 db = Database(DATABASE)
 
-
 class GoogleAPIClient:
     SECRET_PATH = ".credentials/client_secret.json"
     CREDS_PATH = ".credentials/cred.json"
@@ -103,7 +102,7 @@ class GoogleAPIClient:
 
         return user_to_events
 
-    def addNewAccountAndGetCalendar(self, session: str) -> None:
+    def addEmail(self, session: str) -> None:
         user_to_events = {}
         data = []
 
