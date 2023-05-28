@@ -79,6 +79,7 @@ async def view_other_calendar(request: Request, account: str):
 
 
 @app.post("/mail/invite")
+@cross_origin(app)
 async def send_invite(request: Request):
     is_not_pass_auth = await check_session(request)
     if is_not_pass_auth:
