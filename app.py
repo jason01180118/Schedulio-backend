@@ -86,9 +86,9 @@ async def send_invite(request: Request):
     if request.json.get("account") is None:
         return json({"result": "400 Bad Request"}, status=400)
 
-    reciver_account = request.json.get("account")
+    receiver_account = request.json.get("account")
     sender_account = db.get_account_by_session(request.args.get("session"))
-    email = db.get_first_email_by_account(account=reciver_account)
+    email = db.get_first_email_by_account(account=receiver_account)
     if email is not None:
         c = Calendar()
         e = Event()
