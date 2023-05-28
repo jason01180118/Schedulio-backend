@@ -9,7 +9,7 @@ pip3 install virtualenv
 ## 創建虛擬環境
 
 ```
-virtualenv virt 
+python3.10 -m venv "venv"
 ```
 
 ## 允許腳本運行(powershell)
@@ -21,10 +21,10 @@ Set-ExecutionPolicy Unrestricted -Scope Process
 ## 開啟虛擬環境
 
 ```
-.\virt\Scripts\activate.ps1
+.\venv\Scripts\activate.ps1
 ```
 
-## 安裝套件(會看到(virt)在前面)
+## 安裝套件(會看到(venv)在前面)
 
 ```
 pip install -r requirements.txt
