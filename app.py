@@ -57,7 +57,8 @@ def log_in(request: Request):
 
 
 async def check_session(request: Request):
-    return not db.check_if_session_exist(request.cookies.get("session"))
+    return not db.check_if_session_exist(request.args.get("session"))
+
 
 @app.get("/mail/send")
 async def send(request: Request):
@@ -110,14 +111,14 @@ async def send_invite(request: Request):
 def get_calendar(request: Request):
     googleCalendarAPI = GoogleAPIClient()
     # events = googleCalendarAPI.getEvent(451)
-    events = googleCalendarAPI.getEvent(request.cookies.get("session"))
+    events = googleCalendarAPI.getEvent(request.args.get("session"))
     return json(events)
 
 
 @app.route("/add_calendar")
 def add_calendar(request: Request):
     googleCalendarAPI = GoogleAPIClient()
-    googleCalendarAPI.addNewAccountAndGetCalendar(request.cookies.get("session"))
+    googleCalendarAPI.addNewAccountAndGetCalendar(request.args.get("session"))
     # googleCalendarAPI.addNewAccountAndGetCalendar(451)
     return json('success')
 
