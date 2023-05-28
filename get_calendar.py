@@ -5,7 +5,7 @@ from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
-from sanic import Request
+import datetime
 
 from Database import Database
 from env import DATABASE
@@ -26,11 +26,13 @@ class GoogleAPIClient:
     def __init__(self) -> None:
         self.creds1 = None
 
-    def getEvent(self, session):
+    def getEvent(self, session, nameVisible):
         usertoevents = {}
         # session = Request.cookies.get("session")
-        data = db.get_all_cred_by_session(session)
-
+        if(nameVisible):
+            data = db.get_all_cred_by_session(session)
+        else:
+            data = db.get_all_cred_by_account(session)
         # if os.path.exists(self.CREDS_PATH):
         #     with open(self.CREDS_PATH, "r") as json_file:
         #         data = js.load(json_file)
@@ -54,8 +56,8 @@ class GoogleAPIClient:
             # info = js.loads(info)
             self.creds1 = Credentials.from_authorized_user_info (js.loads(info), self.calendareventScope)
             if self.creds1 and self.creds1.expired and self.creds1.refresh_token:
-                self.creds1.refresh(Request())
-                data[i][email] = self.creds1
+                self.creds1.refresh(Request)
+                # data[i][email] = self.creds1
             self.googleAPIService = build(self.serviceName, self.version, credentials=self.creds1)
 
             now = datetime.datetime.today()
@@ -75,10 +77,14 @@ class GoogleAPIClient:
 
                 start = event["start"].get("dateTime", event["start"].get("date"))[:19]
                 end = event["end"].get("dateTime", event["end"].get("date"))[:19]
-                if event.get("summary"):
-                    a["title"] = (event["summary"])
-                else:
-                    a["title"] = ("無標題")
+                a["title"] = ("")
+                if(nameVisible):
+                    if event.get("summary"):
+                        a["title"] = (event["summary"])
+                    else:
+                        a["title"] = ("無標題")
+                # start = datetime.datetime.strptime(start, "%Y-%m-%dT%H:%M:%S")
+                # end = datetime.datetime.strptime(end, "%Y-%m-%dT%H:%M:%S")
                 a["startDate"] = start
                 a["endDate"] = end
                 event_list.append(a)
@@ -101,6 +107,12 @@ class GoogleAPIClient:
         flow1 = InstalledAppFlow.from_client_secrets_file(
             self.SECRET_PATH, self.calendareventScope)
         self.creds1 = flow1.run_local_server(port=0)
+        # try:
+        #     self.creds1 = flow1.run_local_server(port=0)
+        # except ConnectionError:
+        #     print("授权窗口被关闭。")
+        #     return
+        
         self.emailAService = build("oauth2", "v2", credentials=self.creds1)
         user_info = self.emailAService.userinfo().get().execute()
         email = user_info["email"]
