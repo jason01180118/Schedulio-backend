@@ -71,7 +71,7 @@ async def view_other_calendar(request: Request, account: str):
     if email is not None:
         await request.app.ctx.send_email(
             targetlist=email,
-            subject=f"抓到！{viewer_account} 偷看了你的行事曆！",
+            subject=f"[Schedulio] 抓到！{viewer_account} 偷看了你的行事曆！",
             content=f"您好：\n\n請小心 {viewer_account}，因為他看了你的行事曆。\n你也可以查看他的行事曆，因為這樣才公平。\n\n點此查看他的行事曆：http://{HOST}:{FRONTEND_PORT}/{viewer_account}"
         )
 
@@ -83,29 +83,33 @@ async def send_invite(request: Request):
     is_not_pass_auth = await check_session(request)
     if is_not_pass_auth:
         return json({"result": "401 Unauthorized"}, status=401)
-    if request.args.get("email") is None:
+    if request.json.get("account") is None:
         return json({"result": "400 Bad Request"}, status=400)
 
-    c = Calendar()
-    e = Event()
-    e.name = request.json.get("title")
-    e.begin = request.json.get("startDate")
-    e.end = request.json.get("endDate")
-    c.events.add(e)
-    filename = "".join(random.choice(string.ascii_letters + string.digits) for _ in range(10)) + ".ics"
-    with open("invitations/" + filename, "w") as my_file:
-        my_file.writelines(c.serialize_iter())
+    reciver_account = request.json.get("account")
+    sender_account = db.get_account_by_session(request.args.get("session"))
+    email = db.get_first_email_by_account(account=reciver_account)
+    if email is not None:
+        c = Calendar()
+        e = Event()
+        e.name = request.json.get("title")
+        e.begin = request.json.get("startDate")
+        e.end = request.json.get("endDate")
+        c.events.add(e)
+        filename = "".join(random.choice(string.ascii_letters + string.digits) for _ in range(10)) + ".ics"
+        with open("invitations/" + filename, "w") as my_file:
+            my_file.writelines(c.serialize_iter())
+        attachments = {}
+        async with aiofiles.open("invitations/" + filename, "rb") as f:
+            attachments[e.name + ".ics"] = await f.read()
 
-    attachments = {}
-    async with aiofiles.open("invitations/" + filename, "rb") as f:
-        attachments[e.name + ".ics"] = await f.read()
-    await request.app.ctx.send_email(
-        targetlist=db.get_first_email_by_account(request.json.get("account")),
-        subject="⚠️⚡🐛💦😱💩🚫🦖☄🚀🌈🚨",
-        content=request.json.get("content"),
-        attachments=attachments
-    )
-    os.remove("invitations/" + filename)
+        await request.app.ctx.send_email(
+            targetlist=email,
+            subject=f"[Schedulio] {sender_account} 邀請您參加{e.name}",
+            content=request.json.get("content"),
+            attachments=attachments
+        )
+        os.remove("invitations/" + filename)
     return json({"result": "200 OK"})
 
 
