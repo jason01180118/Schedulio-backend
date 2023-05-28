@@ -1,6 +1,7 @@
 import os
 import random
 import string
+from datetime import datetime, timedelta
 from sqlite3 import IntegrityError
 
 import aiofiles
@@ -84,18 +85,20 @@ async def send_invite(request: Request):
     is_not_pass_auth = await check_session(request)
     if is_not_pass_auth:
         return json({"result": "401 Unauthorized"}, status=401)
-    if request.json.get("account") is None:
+    data = request.json.get("data")
+    if data["account"] is None:
         return json({"result": "400 Bad Request"}, status=400)
 
-    receiver_account = request.json.get("account")
+    receiver_account = data["account"]
     sender_account = db.get_account_by_session(request.args.get("session"))
     email = db.get_first_email_by_account(account=receiver_account)
     if email is not None:
         c = Calendar()
-        e = Event()
-        e.name = request.json.get("title")
-        e.begin = request.json.get("startDate")
-        e.end = request.json.get("endDate")
+        e = Event(
+            name=data["title"],
+            begin=fix_time(data["startDate"]),
+            end=fix_time(data["endDate"])
+        )
         c.events.add(e)
         filename = "".join(random.choice(string.ascii_letters + string.digits) for _ in range(10)) + ".ics"
         with open("invitations/" + filename, "w") as my_file:
@@ -107,7 +110,7 @@ async def send_invite(request: Request):
         await request.app.ctx.send_email(
             targetlist=email,
             subject=f"[Schedulio] {sender_account} 邀請您參加{e.name}",
-            content=request.json.get("content"),
+            content=data["content"],
             attachments=attachments
         )
         os.remove("invitations/" + filename)
@@ -138,6 +141,10 @@ async def add_email(request: Request):
 
 async def check_session(request: Request):
     return not db.check_if_session_exist(request.args.get("session"))
+
+
+def fix_time(time: str) -> datetime:
+    return datetime.strptime(time, "%Y-%m-%d %H:%M:%S")
 
 
 if __name__ == "__main__":
