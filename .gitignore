@@ -1,6 +1,7 @@
 conda_makefile.sh
 env.py
 .vscode/
+.DS_Store
 __pycache__/
 .idea/
 venv/

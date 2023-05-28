@@ -40,7 +40,8 @@ def hello(request: Request):
 def sign_up(request: Request):
     try:
         data = request.json.get("data")
-        return text(db.sign_up_and_get_token(data["account"], data["password"]))
+        db.sign_up(data["account"], data["password"])
+        return json({"result": "200 OK"})
     except IntegrityError:
         return json({"error": "Account already exists"}, status=409)
 
@@ -50,15 +51,19 @@ def sign_up(request: Request):
 def log_in(request: Request):
     try:
         data = request.json.get("data")
-        return text(db.login_and_get_token(data["account"], data["password"]))
+        return text(db.login_and_get_session(data["account"], data["password"]))
     except TypeError:
         return json({"error": "Invalid account or password"}, status=401)
 
 
+async def check_session(request: Request):
+    return not db.check_if_session_exist(request.cookies.get("session"))
+
 @app.get("/mail/send")
 async def send(request: Request):
-    if db.check_if_token_exist(request.cookies.get("token")):
-        return json({"result": "401 Unauthorized"})
+    is_not_pass_auth = await check_session(request)
+    if is_not_pass_auth:
+        return json({"result": "401 Unauthorized"}, status=401)
     if request.args.get("email") is None:
         return json({"result": "400 Bad Request"})
 
@@ -72,8 +77,9 @@ async def send(request: Request):
 
 @app.get("/mail/invite")
 async def send_invite(request: Request):
-    if db.check_if_token_exist(request.cookies.get("token")):
-        return json({"result": "401 Unauthorized"})
+    is_not_pass_auth = await check_session(request)
+    if is_not_pass_auth:
+        return json({"result": "401 Unauthorized"}, status=401)
     if request.args.get("email") is None:
         return json({"result": "400 Bad Request"})
 
@@ -104,14 +110,14 @@ async def send_invite(request: Request):
 def get_calendar(request: Request):
     googleCalendarAPI = GoogleAPIClient()
     # events = googleCalendarAPI.getEvent(451)
-    events = googleCalendarAPI.getEvent(request.cookies.get("token"))
+    events = googleCalendarAPI.getEvent(request.cookies.get("session"))
     return json(events)
 
 
 @app.route("/add_calendar")
 def add_calendar(request: Request):
     googleCalendarAPI = GoogleAPIClient()
-    googleCalendarAPI.addNewAccountAndGetCalendar(request.cookies.get("token"))
+    googleCalendarAPI.addNewAccount(request.cookies.get("session"))
     # googleCalendarAPI.addNewAccountAndGetCalendar(451)
     return json('success')
 

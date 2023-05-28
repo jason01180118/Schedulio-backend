@@ -15,42 +15,40 @@ class Database:
     def __init__(self, db: str):
         self.db = db
 
-    def sign_up_and_get_token(self, account: str, password: str) -> str:
+    def sign_up(self, account: str, password: str) -> str:
         with connect(self.db) as conn:
             cursor = conn.cursor()
             cursor.execute(
-                "INSERT INTO users (account, password, token) VALUES (?, ?, ?)",
-                (account, encode(password),
-                 token := f"{id}{datetime.now().strftime('%Y%m%d')}{secrets.token_urlsafe(32)}")
+                "INSERT INTO users (account, password) VALUES (?, ?)",
+                (account, encode(password))
             )
             conn.commit()
-            return token
 
-    def login_and_get_token(self, account: str, password: str) -> str:
+    def login_and_get_session(self, account: str, password: str) -> str:
         with connect(self.db) as conn:
             cursor = conn.cursor()
             cursor.execute(
-                "SELECT id, token FROM users WHERE account = ? AND password = ?",
+                "SELECT id FROM users WHERE account = ? AND password = ?",
                 (account, encode(password))
             )
             user_id = cursor.fetchone()[0]
             cursor.execute(
-                "UPDATE users SET token = ? WHERE id = ?",
-                (token := f"{user_id}{datetime.now().strftime('%Y%m%d%H%M%S')}{secrets.token_urlsafe(32)}", user_id)
+                "UPDATE users SET session = ? WHERE id = ?",
+                (session := f"{user_id}{datetime.now().strftime('%Y%m%d%H%M%S')}{secrets.token_urlsafe(32)}", user_id)
             )
             conn.commit()
-            return token
+            return session
 
-    def check_if_token_exist(self, token: str) -> bool:
+    def check_if_session_exist(self, session: str) -> bool:
         with connect(self.db) as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT token FROM users WHERE token = ?", (token,))
+            cursor.execute("SELECT session FROM users WHERE session = ?", (session,))
             return cursor.fetchone() is not None
 
-    def add_email_and_cred(self, token: str, email: str, credential: str) -> None:
+    def add_email_and_cred(self, session: str, email: str, credential: str) -> None:
         with connect(self.db) as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT id FROM users WHERE token = ?", (token,))
+            cursor.execute("SELECT id FROM users WHERE session = ?", (session,))
             user_id = cursor.fetchone()[0]
             cursor.execute(
                 "INSERT INTO emails (user_id, email, credential) VALUES (?, ?, ?)",
@@ -67,12 +65,12 @@ class Database:
             )
             conn.commit()
 
-    def get_all_cred_by_token(self, token: str) -> list[tuple[str, str]]:
+    def get_all_cred_by_session(self, session: str) -> list[tuple[str, str]]:
         with connect(self.db) as conn:
             cursor = conn.cursor()
             cursor.execute(
                 "SELECT emails.email, emails.credential FROM emails "
-                "JOIN users ON emails.user_id = users.id WHERE users.token = ?",
-                (token,)
+                "JOIN users ON emails.user_id = users.id WHERE users.session = ?",
+                (session,)
             )
             return cursor.fetchall()

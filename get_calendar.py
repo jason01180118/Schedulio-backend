@@ -26,10 +26,10 @@ class GoogleAPIClient:
     def __init__(self) -> None:
         self.creds1 = None
 
-    def getEvent(self, token):
+    def getEvent(self, session):
         usertoevents = {}
-        # token = Request.cookies.get("token")
-        data = db.get_all_cred_by_token(token)
+        # session = Request.cookies.get("session")
+        data = db.get_all_cred_by_session(session)
 
         # if os.path.exists(self.CREDS_PATH):
         #     with open(self.CREDS_PATH, "r") as json_file:
@@ -46,8 +46,8 @@ class GoogleAPIClient:
         #     self.cred_map = {}
         #     self.cred_map[email] = self.creds1.to_json()
         #     data.append(self.cred_map)
-        #     with open(self.CREDS_PATH, "w") as token:
-        #         js.dump(data, token)
+        #     with open(self.CREDS_PATH, "w") as session:
+        #         js.dump(data, session)
 
         for i, m in enumerate(data):
             email, info = m[0], m[1]
@@ -85,12 +85,12 @@ class GoogleAPIClient:
 
             usertoevents[email] = event_list
             db.update_cred_by_email((self.creds1.to_json()), email)
-        # with open(self.CREDS_PATH, "w") as token:
-        #     js.dump(data, token)
+        # with open(self.CREDS_PATH, "w") as session:
+        #     js.dump(data, session)
 
         return usertoevents
 
-    def addNewAccountAndGetCalendar(self, token):
+    def addNewAccountAndGetCalendar(self, session):
         usertoevents = {}
         data = []
 
@@ -108,14 +108,14 @@ class GoogleAPIClient:
         self.cred_map[email] = self.creds1.to_json()
         # a = Request
 
-        # token = Request.cookies.get("token")
+        # session = Request.cookies.get("session")
         info = self.creds1.to_json()
-        db.add_email_and_cred(token, email, (info))
+        db.add_email_and_cred(session, email, (info))
         # data.append(self.cred_map)
-        # with open(self.CREDS_PATH, "w") as token:
-        #     js.dump(data, token)
+        # with open(self.CREDS_PATH, "w") as session:
+        #     js.dump(data, session)
 
-        # usertoevents = self.getEvent(token)
+        # usertoevents = self.getEvent(session)
 
         # return usertoevents
 
@@ -127,8 +127,8 @@ class GoogleAPIClient:
     #         flow = InstalledAppFlow.from_client_secrets_file(
     #             self.SECRET_PATH, self.calendarFreebusyScope)
     #         self.creds = flow.run_local_server(port=0)
-    #         with open(self.CREDS_PATH, "w") as token:
-    #             token.write(self.creds.to_json())
+    #         with open(self.CREDS_PATH, "w") as session:
+    #             session.write(self.creds.to_json())
 
     #     self.googleAPIService = build(self.serviceName, self.version, credentials=self.creds)
 
@@ -146,13 +146,13 @@ class GoogleAPIClient:
 # @app.route("/get_calendar")
 # def get_calendar(request:Request):
 #     googleCalendarAPI = GoogleAPIClient()
-#     events = googleCalendarAPI.getEvent(request.cookies.get("token"))
+#     events = googleCalendarAPI.getEvent(request.cookies.get("session"))
 #     return json(events)
 
 # @app.route("/add_calendar")
 # def add_calendar(request:Request):
 #     googleCalendarAPI = GoogleAPIClient()
-#     events = googleCalendarAPI.addNewAccountAndGetCalendar(request.cookies.get("token"))
+#     events = googleCalendarAPI.addNewAccountAndGetCalendar(request.cookies.get("session"))
 #     return json(events)
 
 # if __name__ == "__main__":
