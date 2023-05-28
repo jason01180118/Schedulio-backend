@@ -59,7 +59,7 @@ class GoogleAPIClient:
             print(email)
             print(info)
             print()
-            self.creds1 = Credentials.from_authorized_user_info(info, self.calendareventScope)
+            self.creds1 = Credentials.from_authorized_user_info (js.loads(info), self.calendareventScope)
             print(self.creds1)
             print()
             if self.creds1 and self.creds1.expired and self.creds1.refresh_token:
@@ -115,7 +115,7 @@ class GoogleAPIClient:
         email = user_info["email"]
         self.cred_map = {}
         self.cred_map[email] = self.creds1.to_json()
-        a = Request
+        # a = Request
 
         # token = Request.cookies.get("token")
         print()
@@ -126,9 +126,9 @@ class GoogleAPIClient:
         # with open(self.CREDS_PATH, "w") as token:
         #     js.dump(data, token)
 
-        usertoevents = self.getEvent(token)
+        # usertoevents = self.getEvent(token)
 
-        return usertoevents
+        # return usertoevents
 
     # def getFreebusy(self):
     #     if os.path.exists(self.CREDS_PATH):
