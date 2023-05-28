@@ -35,7 +35,7 @@ def hello(request: Request):
     return text("Hi 😎")
 
 
-@app.route("/sign_up", methods=["POST"])
+@app.post("/sign_up")
 @cross_origin(app)
 def sign_up(request: Request):
     try:
@@ -45,7 +45,7 @@ def sign_up(request: Request):
         return json({"error": "Account already exists"}, status=409)
 
 
-@app.route("/log_in", methods=["POST"])
+@app.post("/log_in")
 @cross_origin(app)
 def log_in(request: Request):
     try:
@@ -103,14 +103,14 @@ async def send_invite(request: Request):
 @app.route("/get_calendar")
 def get_calendar(request: Request):
     googleCalendarAPI = GoogleAPIClient()
-    events = googleCalendarAPI.getEvent(request.args.get("token"))
+    events = googleCalendarAPI.getEvent(request.cookies.get("token"))
     return json(events)
 
 
 @app.route("/add_calendar")
 def add_calendar(request: Request):
     googleCalendarAPI = GoogleAPIClient()
-    events = googleCalendarAPI.addNewAccountAndGetCalendar(request.args.get("token"))
+    events = googleCalendarAPI.addNewAccountAndGetCalendar(request.cookies.get("token"))
     return json(events)
 
 

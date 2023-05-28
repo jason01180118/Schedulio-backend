@@ -69,7 +69,7 @@ class Database:
         with connect(self.db) as conn:
             cursor = conn.cursor()
             cursor.execute(
-                "SELECT emails.email, emails.credential FROM emails"
+                "SELECT emails.email, emails.credential FROM emails "
                 "JOIN users ON emails.user_id = users.id WHERE users.token = ?",
                 (token,)
             )
